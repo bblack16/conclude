@@ -18,10 +18,14 @@ module Conclude
       end
     end
 
+    def empty?
+      rules.empty?
+    end
+
     # Assigned score based on the weight of each matched rule.
     # This number is arbitrary.
     def score(attributes)
-      raise EmptyRuleSetException, 'Empty rule sets cannot provide a score. Add a rule first.' if rules.empty?
+      raise EmptyRuleSetException, 'Empty rule sets cannot provide a score. Add a rule first.' if empty?
       rules.inject(0) do |score, rule|
         return 0 if !rule.match?(attributes) && rule.required?
         score += rule.score(attributes)
@@ -36,6 +40,16 @@ module Conclude
       rules.hmap do |rule|
         [rule.name, rule.confidence(object)]
       end
+    end
+
+    def summary(object, score = nil)
+      score = score(object) unless score
+      {
+        score: score,
+        weight: weight,
+        confidence: confidence(object, score),
+        confident: confident?(object, score)
+      }
     end
 
   end
