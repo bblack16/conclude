@@ -44,15 +44,17 @@ module Conclude
       1
     end
 
-    # Creates a percentage based confidence level based on score / weight
-    def confidence(obj)
-      score = contributed_weight.zero? ? score(obj) : score(obj) / contributed_weight
+    # Creates a percentage based confidence level based on score / weight.
+    # A score can be passed in in case it was already calculated soit doesn't
+    # need to be recalculated.
+    def confidence(obj, score = nil)
+      score = score || contributed_weight.zero? ? score(obj) : score(obj) / contributed_weight
       BBLib.keep_between(score.to_f, 0, 1.0) * 100
     end
 
     # True if the confidence score is greater than or equal to the threshold
-    def confident?(obj)
-      confidence(obj) >= threshold
+    def confident?(obj, score = nil)
+      confidence(obj, score) >= threshold
     end
 
     alias_method :match?, :confident?
