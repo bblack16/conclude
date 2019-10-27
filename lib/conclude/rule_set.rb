@@ -42,6 +42,20 @@ module Conclude
       end
     end
 
+    def statistics(object)
+      stats = rules.hmap do |rule|
+        [
+          rule.name,
+          rule.is_a?(RuleSet) ? rule.statistics(object) : {
+            score: rule.score(object),
+            duration: rule.timer.last
+          }
+        ]
+      end
+      total = stats.inject(0) { |sum, (k, v)| sum += v[:duration] }
+      stats.merge(duration: total)
+    end
+
     def summary(object, score = nil)
       score = score(object) unless score
       {

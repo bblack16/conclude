@@ -33,6 +33,14 @@ module Conclude
     # none can match.
     attr_element_of proc { |x| x.expression_modes }, :mode, default: :any
 
+    # Used to timehow long a rule takes to run.
+    attr_of BBLib::TaskTimer, :timer, default_proc: proc { BBLib::TaskTimer.new }, singleton: true
+
+    bridge_method :timer
+
+    before :score, :start_timer
+    after :score, :stop_timer
+
     def self.expression_modes
       EXPRESSION_MODES
     end
@@ -67,6 +75,14 @@ module Conclude
 
     def aggregation_method
       mode == :none ? :any? : "#{mode}?"
+    end
+
+    def start_timer
+      timer.start
+    end
+
+    def stop_timer
+      timer.stop
     end
 
   end
